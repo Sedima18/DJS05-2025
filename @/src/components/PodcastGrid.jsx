@@ -5,13 +5,13 @@ export default function PodcastGrid({ podcasts, search, onSearch }) {
   const [sort, setSort] = useState("newest");
   const [genre, setGenre] = useState("all");
 
-  // 🔹 Get unique genres
+  //  Get unique genres
   const genres = [
     "all",
     ...new Set(podcasts.flatMap((podcast) => podcast.genres)),
   ];
 
-  // 🔹 Filter by search + genre
+  //  Filter by search + genre
   let filtered = podcasts.filter((podcast) => {
     const matchesSearch = podcast.title
       .toLowerCase()
@@ -23,7 +23,7 @@ export default function PodcastGrid({ podcasts, search, onSearch }) {
     return matchesSearch && matchesGenre;
   });
 
-  // 🔹 Sort logic
+  //  Sort logic
   if (sort === "az") {
     filtered.sort((a, b) => a.title.localeCompare(b.title));
   }
