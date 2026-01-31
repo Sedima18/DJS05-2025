@@ -98,3 +98,47 @@ button {
   border-radius: 999px;
   font-size: 0.75rem;
 }
+
+/* Podcast grid layout */
+.podcast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+/* Podcast card (adjusted for grid) */
+.podcast-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--card);
+  padding: 1rem;
+  border-radius: 12px;
+  height: 100%;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.podcast-card:hover {
+  background: #1f2937;
+  transform: translateY(-2px);
+}
+
+/* Image */
+.podcast-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+}
+
+/* Info */
+.podcast-info h3 {
+  margin-bottom: 0.25rem;
+}
+
+.genres {
+  margin-top: auto;
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}

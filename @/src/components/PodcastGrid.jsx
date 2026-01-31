@@ -15,7 +15,7 @@ export default function PodcastGrid({ podcasts, search, onSearch }) {
         className="search-input"
       />
 
-      <div className="podcast-list">
+      <div className="podcast-grid">
         {filtered.map((podcast) => (
           <PodcastCard key={podcast.id} podcast={podcast} />
         ))}
