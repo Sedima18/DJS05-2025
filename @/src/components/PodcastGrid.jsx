@@ -5,13 +5,13 @@ export default function PodcastGrid({ podcasts, search, onSearch }) {
   const [sort, setSort] = useState("newest");
   const [genre, setGenre] = useState("all");
 
-  //  Get unique genres
+  // Get unique genre IDs
   const genres = [
     "all",
     ...new Set(podcasts.flatMap((podcast) => podcast.genres)),
   ];
 
-  //  Filter by search + genre
+  // Filter by search + genre
   let filtered = podcasts.filter((podcast) => {
     const matchesSearch = podcast.title
       .toLowerCase()
@@ -23,7 +23,7 @@ export default function PodcastGrid({ podcasts, search, onSearch }) {
     return matchesSearch && matchesGenre;
   });
 
-  //  Sort logic
+  // Sort logic
   if (sort === "az") {
     filtered.sort((a, b) => a.title.localeCompare(b.title));
   }
@@ -36,32 +36,33 @@ export default function PodcastGrid({ podcasts, search, onSearch }) {
 
   return (
     <div className="container">
-      {/* 🔍 Search */}
-      <input
-        type="text"
-        placeholder="Search podcasts..."
-        value={search}
-        onChange={(e) => onSearch(e.target.value)}
-        className="search-input"
-      />
+      {/* Search + Filters */}
+      <div className="search-filter-bar">
+        <input
+          type="text"
+          placeholder="Search podcasts..."
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+        />
 
-      {/* 🎛 Filters */}
-      <div className="filters">
         <select value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="newest">Newest</option>
           <option value="az">A–Z</option>
+          <option value="newest">Newest</option>
         </select>
 
         <select value={genre} onChange={(e) => setGenre(e.target.value)}>
-          {genres.map((g) => (
-            <option key={g} value={g}>
-              {g === "all" ? "All Genres" : `Genre ${g}`}
-            </option>
-          ))}
+          <option value="all">All Genres</option>
+          {genres
+            .filter((g) => g !== "all")
+            .map((g) => (
+              <option key={g} value={g}>
+                Genre {g}
+              </option>
+            ))}
         </select>
       </div>
 
-      {/* 🧩 Podcast Grid */}
+      {/* Podcast Grid */}
       <div className="podcast-grid">
         {filtered.map((podcast) => (
           <PodcastCard key={podcast.id} podcast={podcast} />
