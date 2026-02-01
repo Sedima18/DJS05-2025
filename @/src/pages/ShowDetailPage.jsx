@@ -1,6 +1,13 @@
 /**
  * ShowDetailPage
- * Displays a single podcast show with metadata and seasons
+ * ----------------
+ * Displays detailed information for a single podcast show.
+ * Includes:
+ * - Show image and description
+ * - Genre names (mapped from genre IDs)
+ * - Total episodes and seasons
+ * - Last updated date
+ * - Season selector with episode list
  */
 
 import { useParams, useNavigate } from "react-router-dom";
@@ -12,13 +19,18 @@ import { formatDate } from "../utils/formatDate";
 import Loading from "../components/Loading";
 
 export default function ShowDetailPage() {
+  /** Get show ID from URL */
   const { id } = useParams();
   const navigate = useNavigate();
 
+  /** Component state */
   const [show, setShow] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  /**
+   * Fetch show data when ID changes
+   */
   useEffect(() => {
     if (!id) return;
 
@@ -28,38 +40,50 @@ export default function ShowDetailPage() {
 
     fetchPodcastById(id)
       .then((data) => {
-        // Validate API response
         if (!data || !Array.isArray(data.seasons)) {
           throw new Error("Invalid show data");
         }
         setShow(data);
       })
       .catch((err) => {
-        console.error("Show fetch failed:", err);
+        console.error("Failed to load show:", err);
         setError("Failed to load show");
       })
       .finally(() => setLoading(false));
   }, [id]);
 
-  // ---- STATES ----
+  /** Loading & error states */
   if (loading) return <Loading />;
   if (error) return <p className="error">{error}</p>;
   if (!show) return <p>Show not found.</p>;
 
-  // ---- SAFE DERIVED DATA ----
+  /**
+   * Calculate total number of episodes safely
+   * @returns {number}
+   */
   const totalEpisodes = show.seasons.reduce(
     (total, season) =>
-      total + (season.episodes ? season.episodes.length : 0),
+      total + (Array.isArray(season.episodes) ? season.episodes.length : 0),
     0
   );
 
-  const genreNames = Array.isArray(show.genres)
-    ? show.genres.map((gid) => genreMap[gid]).filter(Boolean)
-    : [];
+  /**
+   * Convert genre IDs to readable genre names
+   * @param {number[]} genres
+   * @returns {string}
+   */
+  const getGenreNames = (genres) => {
+    if (!Array.isArray(genres)) return "";
+
+    return genres
+      .map((id) => genreMap[id])
+      .filter(Boolean)
+      .join(" • ");
+  };
 
   return (
     <div className="container show-page">
-      {/* Back button */}
+      {/* Back Button */}
       <button className="back-btn" onClick={() => navigate("/")}>
         ← Back
       </button>
@@ -78,8 +102,7 @@ export default function ShowDetailPage() {
           <p className="show-description">{show.description}</p>
 
           <p className="show-meta">
-            <strong>Genres:</strong>{" "}
-            {genreNames.length ? genreNames.join(" • ") : "N/A"}
+            <strong>Genres:</strong> {getGenreNames(show.genres)}
           </p>
 
           <p className="show-meta">
@@ -96,7 +119,7 @@ export default function ShowDetailPage() {
         </div>
       </div>
 
-      {/* SEASONS */}
+      {/* SEASONS & EPISODES */}
       <SeasonList seasons={show.seasons} />
     </div>
   );
