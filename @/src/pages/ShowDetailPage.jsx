@@ -1,15 +1,3 @@
-/**
- * ShowDetailPage
- * ----------------
- * Displays detailed information for a single podcast show.
- * Includes:
- * - Show image and description
- * - Genre names (mapped from genre IDs)
- * - Total episodes and seasons
- * - Last updated date
- * - Season navigation with episodes
- */
-
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchPodcastById } from "../api/fetchPodcast";
@@ -26,9 +14,6 @@ export default function ShowDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  /**
-   * Fetch show data when ID changes
-   */
   useEffect(() => {
     if (!id) return;
 
@@ -44,7 +29,7 @@ export default function ShowDetailPage() {
         setShow(data);
       })
       .catch((err) => {
-        console.error("Failed to load show:", err);
+        console.error("Show fetch failed:", err);
         setError("Failed to load show");
       })
       .finally(() => setLoading(false));
@@ -54,44 +39,40 @@ export default function ShowDetailPage() {
   if (error) return <p className="error">{error}</p>;
   if (!show) return <p>Show not found.</p>;
 
-  /** Calculate total episodes safely */
+  // Total episodes across all seasons
   const totalEpisodes = show.seasons.reduce(
     (total, season) =>
       total + (Array.isArray(season.episodes) ? season.episodes.length : 0),
     0
   );
 
-  /** Convert genre IDs to readable genre names */
-  const getGenreNames = (genres) => {
-    if (!Array.isArray(genres)) return "";
-    return genres
-      .map((id) => genreMap[id])
-      .filter(Boolean)
-      .join(" • ");
-  };
+  // Map genre IDs to readable names
+  const genreNames = Array.isArray(show.genres)
+    ? show.genres.map((gid) => genreMap[gid]).filter(Boolean)
+    : [];
 
   return (
     <div className="container show-page">
-      {/* Back Button */}
+      {/* BACK BUTTON */}
       <button className="back-btn" onClick={() => navigate("/")}>
         ← Back
       </button>
 
       {/* HERO SECTION */}
       <div className="show-hero">
-        {/* IMAGE */}
+        {/* LEFT IMAGE */}
         <div className="show-image">
           <img src={show.image} alt={show.title} />
         </div>
 
-        {/* INFO */}
+        {/* RIGHT INFO */}
         <div className="show-info">
           <h1>{show.title}</h1>
 
           <p className="show-description">{show.description}</p>
 
           <p className="show-meta">
-            <strong>Genres:</strong> {getGenreNames(show.genres)}
+            <strong>Genres:</strong> {genreNames.join(" • ")}
           </p>
 
           <p className="show-meta">
@@ -108,8 +89,8 @@ export default function ShowDetailPage() {
         </div>
       </div>
 
-      {/* SEASONS & EPISODES */}
+      {/* SEASONS WITH DROPDOWN */}
       <SeasonList seasons={show.seasons} />
     </div>
-);
+  );
 }
